@@ -4,17 +4,32 @@ from pydantic import Field
 from fastapi import HTTPException, Path, APIRouter
 from database import db_dependency
 from models import Users
+from passlib.context import CryptContext
 
-router = APIRouter(prefix="/users")
+# TODO config to main.py
+router = APIRouter(
+    prefix="/users",
+    tags=["users"]
+)
 
+bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+# TODO: to dto
 class CreateUserRequest(BaseModel):
     name: str = Field()
     surname: str = Field()
     password: str = Field()
 
+
 @router.post("/", status_code=status.HTTP_201_CREATED)
+# TODO: dependency
 async def create_user(db: db_dependency, user_request: CreateUserRequest):
-    user_model = Users(**user_request.model_dump())
+    user_model = Users(
+        name=user_request.name,
+        surname=user_request.surname,
+        password=bcrypt_context.hash(user_request.password)
+    )
 
     db.add(user_model)
     db.commit()
