@@ -22,7 +22,7 @@ class ChatMembers(Base):
     __tablename__ = 'chat_members'
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    chat_id = Column(Integer, ForeignKey('chats.id'))
+    chat_id = Column(Integer, ForeignKey('chat_room.id'))
 
 
 class ChatMessages(Base):
