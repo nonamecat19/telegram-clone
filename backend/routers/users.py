@@ -1,43 +1,31 @@
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 from starlette import status
 from pydantic import Field
-from typing import Annotated
-from fastapi import Depends, HTTPException, Path, APIRouter
+from fastapi import HTTPException, Path, APIRouter
+from database import db_dependency
 from models import Users
-from database import engine
 
-router = APIRouter()
+router = APIRouter(prefix="/users")
 
+class CreateUserRequest(BaseModel):
+    name: str = Field()
+    surname: str = Field()
+    password: str = Field()
 
-def get_db():
-    db = Session(engine)
-    try:
-        yield db
-    finally:
-        db.close()
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_user(db: db_dependency, user_request: CreateUserRequest):
+    user_model = Users(**user_request.model_dump())
 
-
-db_dependency = Annotated[Session, Depends(get_db)]
-
-
-class UserRequest(BaseModel):
-    name: str = Field(min_length=3)
-    surname: str = Field(min_length=3)
-    banned: bool = Field(default=False)
+    db.add(user_model)
+    db.commit()
 
 
 @router.get("/")
-async def root(db: db_dependency):
-    return db.query(Users).all()
-
-
-@router.get("/users")
 async def users(db: db_dependency):
     return db.query(Users).all()
 
 
-@router.get("/users/{user_id}")
+@router.get("/{user_id}")
 async def user(db: db_dependency, user_id: int = Path(gt=0)):
     user_model = db.query(Users).filter(Users.id == user_id).first()
     if user_model is not None:
@@ -45,16 +33,13 @@ async def user(db: db_dependency, user_id: int = Path(gt=0)):
     raise HTTPException(status_code=404, detail="User not found")
 
 
-@router.post("/users", status_code=status.HTTP_201_CREATED)
-async def create_user(db: db_dependency, user_request: UserRequest):
-    user_model = Users(**user_request.model_dump())
+class UpdateUserRequest(BaseModel):
+    name: str = Field(min_length=3)
+    surname: str = Field(min_length=3)
+    banned: bool = Field(default=False)
 
-    db.add(user_model)
-    db.commit()
-
-
-@router.put("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_user(db: db_dependency, user_id: int, user_request: UserRequest):
+@router.put("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def update_user(db: db_dependency, user_id: int, user_request: UpdateUserRequest):
     user_model = db.query(Users).filter(Users.id == user_id).first()
     if user_model is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -67,7 +52,7 @@ async def update_user(db: db_dependency, user_id: int, user_request: UserRequest
     db.commit()
 
 
-@router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(db: db_dependency, user_id: int):
     user_model = db.query(Users).filter(Users.id == user_id).first()
     if user_model is None:
