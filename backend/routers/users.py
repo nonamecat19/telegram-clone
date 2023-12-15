@@ -1,7 +1,8 @@
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from starlette import status
 from pydantic import Field
-from fastapi import HTTPException, Path, APIRouter
+from fastapi import HTTPException, Path, APIRouter, Depends
 from database import db_dependency
 from models import Users
 from passlib.context import CryptContext
@@ -19,7 +20,7 @@ bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class CreateUserRequest(BaseModel):
     name: str = Field()
     surname: str = Field()
-    password: str = Field()
+    password: str
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
@@ -30,7 +31,6 @@ async def create_user(db: db_dependency, user_request: CreateUserRequest):
         surname=user_request.surname,
         password=bcrypt_context.hash(user_request.password)
     )
-
     db.add(user_model)
     db.commit()
 
@@ -74,3 +74,5 @@ async def delete_user(db: db_dependency, user_id: int):
         raise HTTPException(status_code=404, detail="User not found")
     db.query(Users).filter(Users.id == user_id).delete()
     db.commit()
+
+
