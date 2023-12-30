@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from starlette import status
@@ -6,6 +8,7 @@ from fastapi import HTTPException, Path, APIRouter, Depends
 from database import db_dependency
 from models import Users
 from passlib.context import CryptContext
+from .auth import get_current_user
 
 # TODO config to main.py
 router = APIRouter(
@@ -14,7 +17,7 @@ router = APIRouter(
 )
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+user_dependency = Depends(Annotated[dict, Depends(get_current_user)])
 
 # TODO: to dto
 class CreateUserRequest(BaseModel):
