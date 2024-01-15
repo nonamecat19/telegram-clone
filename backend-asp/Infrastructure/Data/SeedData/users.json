@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "Name1",
+    "Surname": "Surname1",
+    "Password": "secret"
+  },
+  {
+    "Name": "Name2",
+    "Surname": "Surname2",
+    "Password": "secret"
+  },
+  {
+    "Name": "Name3",
+    "Surname": "Surname3",
+    "Password": "secret"
+  }
+]
