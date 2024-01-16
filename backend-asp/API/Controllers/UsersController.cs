@@ -1,3 +1,4 @@
+using API.Dto;
 using Core.Entities;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,14 +10,26 @@ namespace API.Controllers;
 public class UsersController(IGenericRepository<User> usersRepo) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<User>>> GetUsers()
+    public async Task<ActionResult<List<UsersToReturnDto>>> GetUsers()
     {
-        return Ok(await usersRepo.ListAllAsync());
+        var users = await usersRepo.ListAllAsync();
+        return users.Select(user => new UsersToReturnDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Surname = user.Surname
+        }).ToList();
     }
     
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<User>> GetUsers(int id)
+    public async Task<ActionResult<UsersToReturnDto>> GetUsersById(int id)
     {
-        return await usersRepo.GetByIdAsync(id);
+        var user = await usersRepo.GetByIdAsync(id);
+        return new UsersToReturnDto
+        {
+             Id   = user.Id,
+             Name =  user.Name,
+             Surname = user.Surname
+        };
     }
 }
