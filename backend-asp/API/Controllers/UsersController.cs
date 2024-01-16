@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+// ReSharper disable once SuggestBaseTypeForParameterInConstructor
 public class UsersController(IGenericRepository<User> usersRepo, IMapper mapper) : BaseApiController
 {
     [HttpGet]
