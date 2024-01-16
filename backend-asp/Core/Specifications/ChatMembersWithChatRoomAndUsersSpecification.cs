@@ -4,7 +4,10 @@ namespace Core.Specifications;
 
 public class ChatMembersWithChatRoomAndUsersSpecification : BaseSpecification<ChatMember>
 {
-   public ChatMembersWithChatRoomAndUsersSpecification() 
+   public ChatMembersWithChatRoomAndUsersSpecification(int? chatRoomId, int? userId) 
+      : base(x => 
+      (!chatRoomId.HasValue || x.ChatRoomId == chatRoomId) && 
+      (!userId.HasValue || x.UserId == userId)) 
    {
       AddInclude(x => x.ChatRoom);
       AddInclude(x => x.User);

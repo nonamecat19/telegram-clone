@@ -8,9 +8,9 @@ namespace API.Controllers;
 public class ChatMembersController(IGenericRepository<ChatMember> chatMembersRepo) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<List<ChatMember>>> GetChatMembers()
+    public async Task<ActionResult<List<ChatMember>>> GetChatMembers(int? chatRoomId, int? userId)
     {
-        var spec = new ChatMembersWithChatRoomAndUsersSpecification();
+        var spec = new ChatMembersWithChatRoomAndUsersSpecification(chatRoomId, userId);
         return Ok(await chatMembersRepo.ListAsync(spec));
     }
     
