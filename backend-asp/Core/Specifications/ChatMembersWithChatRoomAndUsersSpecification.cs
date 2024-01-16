@@ -9,4 +9,10 @@ public class ChatMembersWithChatRoomAndUsersSpecification : BaseSpecification<Ch
       AddInclude(x => x.ChatRoom);
       AddInclude(x => x.User);
    }
+
+   public ChatMembersWithChatRoomAndUsersSpecification(int chatRoomId) : base(x => x.ChatRoomId == chatRoomId)
+   {
+      AddInclude(x => x.ChatRoom);
+      AddInclude(x => x.User); 
+   }
 }

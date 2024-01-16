@@ -16,12 +16,10 @@ public class ChatMembersController(IGenericRepository<ChatMember> chatMembersRep
         return Ok(await chatMembersRepo.ListAsync(spec));
     }
     
-    [HttpGet("/chatRoom/{chatRoomId:int}")]
+    [HttpGet("chatRoom/{chatRoomId:int}")]
     public async Task<ActionResult<List<ChatMember>>> GetChatMembersByRoomId(int chatRoomId)
     {
-        var spec = new ChatMembersWithChatRoomAndUsersSpecification();
-        // to room id
-        var chatMembers = await chatMembersRepo.ListAsync(spec);
-        return Ok(chatMembers);
+        var spec = new ChatMembersWithChatRoomAndUsersSpecification(chatRoomId);
+        return Ok(await chatMembersRepo.GetEntityWithSpec(spec));
     }
 }
