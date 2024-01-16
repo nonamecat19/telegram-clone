@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class UsersController(IGenericRepository<User> usersRepo, IMapperBase mapper) : ControllerBase
+public class UsersController(IGenericRepository<User> usersRepo, IMapper mapper) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<UsersToReturnDto>>> GetUsers()

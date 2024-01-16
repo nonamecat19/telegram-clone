@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class ChatMembersController(IGenericRepository<ChatMember> chatMembersRepo) : ControllerBase
+public class ChatMembersController(IGenericRepository<ChatMember> chatMembersRepo) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<List<ChatMember>>> GetChatMembers()
