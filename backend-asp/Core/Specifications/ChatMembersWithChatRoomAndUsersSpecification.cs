@@ -4,18 +4,22 @@ namespace Core.Specifications;
 
 public class ChatMembersWithChatRoomAndUsersSpecification : BaseSpecification<ChatMember>
 {
-   public ChatMembersWithChatRoomAndUsersSpecification(int? chatRoomId, int? userId) 
+   public ChatMembersWithChatRoomAndUsersSpecification(ChatMembersSpecParams chatMembersParams) 
       : base(x => 
-      (!chatRoomId.HasValue || x.ChatRoomId == chatRoomId) && 
-      (!userId.HasValue || x.UserId == userId)) 
+      (!chatMembersParams.ChatRoomId.HasValue || x.ChatRoomId == chatMembersParams.ChatRoomId) && 
+      (!chatMembersParams.UserId.HasValue || x.UserId == chatMembersParams.UserId)) 
+   {
+      Console.WriteLine(chatMembersParams);
+      AddInclude(x => x.ChatRoom);
+      AddInclude(x => x.User);
+      AddOrderBy(x => x.Id);
+      ApplyPaging(chatMembersParams.PageSize * (chatMembersParams.PageIndex - 1), chatMembersParams.PageSize);
+   }
+
+   public ChatMembersWithChatRoomAndUsersSpecification(int id) : base(x => x.Id == id)
    {
       AddInclude(x => x.ChatRoom);
       AddInclude(x => x.User);
-   }
-
-   public ChatMembersWithChatRoomAndUsersSpecification(int chatRoomId) : base(x => x.ChatRoomId == chatRoomId)
-   {
-      AddInclude(x => x.ChatRoom);
-      AddInclude(x => x.User); 
+      AddOrderBy(x => x.Id);
    }
 }

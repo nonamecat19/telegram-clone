@@ -1,3 +1,4 @@
+using API.Helpers;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
@@ -8,16 +9,9 @@ namespace API.Controllers;
 public class ChatMembersController(IGenericRepository<ChatMember> chatMembersRepo) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<List<ChatMember>>> GetChatMembers(int? chatRoomId, int? userId)
+    public async Task<ActionResult<Pagination<ChatMember>>> GetChatMembers([FromQuery]ChatMembersSpecParams chatMembersParams)
     {
-        var spec = new ChatMembersWithChatRoomAndUsersSpecification(chatRoomId, userId);
+        var spec = new ChatMembersWithChatRoomAndUsersSpecification(chatMembersParams);
         return Ok(await chatMembersRepo.ListAsync(spec));
-    }
-    
-    [HttpGet("chatRoom/{chatRoomId:int}")]
-    public async Task<ActionResult<List<ChatMember>>> GetChatMembersByRoomId(int chatRoomId)
-    {
-        var spec = new ChatMembersWithChatRoomAndUsersSpecification(chatRoomId);
-        return Ok(await chatMembersRepo.GetEntityWithSpec(spec));
     }
 }
