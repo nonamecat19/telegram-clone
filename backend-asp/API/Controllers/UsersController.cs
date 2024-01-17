@@ -22,4 +22,11 @@ public class UsersController(IGenericRepository<User> usersRepo, IMapper mapper)
         var user = await usersRepo.GetByIdAsync(id);
         return Ok(mapper.Map<User, UsersToReturnDto>(user));
     }
+    
+    [HttpPost("register")]
+    public async Task<ActionResult> Register([FromBody]User body)
+    {
+        await usersRepo.AddAsync(body); 
+        return Ok();
+    }
 }

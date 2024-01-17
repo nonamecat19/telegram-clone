@@ -33,6 +33,12 @@ public class GenericRepository<T>(StoreContext context) : IGenericRepository<T>
         return await ApplySpecification(spec).CountAsync();
     }
 
+    public async Task AddAsync(T newItem)
+    {
+        await context.Set<T>().AddAsync(newItem);
+        await context.SaveChangesAsync();
+    }
+
     private IQueryable<T> ApplySpecification(ISpecification<T> spec)
     {
         return SpecificationEvaluator<T>.GetQuery(context.Set<T>().AsQueryable(), spec);

@@ -1,8 +1,13 @@
+using System.Security.Claims;
+using System.Text;
 using API.Errors;
+using API.Services;
 using Core.Interfaces;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace API.Extensions;
 
@@ -36,7 +41,7 @@ public static class ApplicationServicesExtensions
             return new BadRequestObjectResult(errorResponse);
          };
       });
-
+      services.AddScoped<JwtService>();
       services.AddCors(opt =>
       {
          opt.AddPolicy("CorsPolicy", policy =>
@@ -44,6 +49,35 @@ public static class ApplicationServicesExtensions
             policy.AllowAnyHeader().AllowAnyHeader().AllowAnyOrigin();
          });
       });
+      
+      services.AddAuthentication(x =>
+      {
+         x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+         x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+         x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+      }).AddJwtBearer(x =>
+      {
+         x.TokenValidationParameters = new TokenValidationParameters
+         {
+            ValidIssuer = config["JwtSettings:Issuer"],
+            ValidAudience = config["JwtSettings:Issuer"],
+            IssuerSigningKey= new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Key"] ?? string.Empty)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+         };
+         x.Events = new JwtBearerEvents
+         {
+            OnTokenValidated = context =>
+            {
+               var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+               return Task.CompletedTask;
+            }
+         };
+      });
+      
+      services.AddAuthorization();
       
       return services;
    }
